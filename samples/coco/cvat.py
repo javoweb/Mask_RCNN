@@ -68,7 +68,7 @@ DEFAULT_DATASET_YEAR = "2014"
 ############################################################
 
 
-class CocoConfig(Config):
+class CocoConfig(Config, num_classes):
     """Configuration for training on MS COCO.
     Derives from the base Config class and overrides values specific
     to the COCO dataset.
@@ -81,11 +81,14 @@ class CocoConfig(Config):
     IMAGES_PER_GPU = 1
 
     # Uncomment to train on 8 GPUs (default is 1)
-    # GPU_COUNT = 8
-    STEPS_PER_EPOCH = 600
+    GPU_COUNT = 1
+    local_device_protos = device_lib.list_local_devices()
+    num_gpus = len([x.name for x in local_device_protos if x.device_type == 'GPU'])
+    if num_gpus in [2,4,8]:
+    	GPU_COUNT = num_gpus
 
     # Number of classes (including background)
-    NUM_CLASSES = 2  # take form user *************************
+    NUM_CLASSES = num_classes  # take form user *************************
 
 ############################################################
 #  Dataset
@@ -430,6 +433,10 @@ if __name__ == '__main__':
                         metavar="<True|False>",
                         help='Automatically download and unzip MS-COCO files (default=False)',
                         type=bool)
+    parser.add_argument('--num_classes', required=True, default=2, help="Number of Classes")
+    parser.add_argument('--stage1_epochs', required=False, default=40, help="number of epochs for heads")
+    parser.add_argument('--stage2_epochs', required=False, default=120, help="number of epochs for resnet stage 4 and up")
+    parser.add_argument('--stage3_epochs', required=False, default=160, help="number of epochs for fine tuning all layers")
     args = parser.parse_args()
     print("Command: ", args.command)
     print("Model: ", args.model)
@@ -440,12 +447,16 @@ if __name__ == '__main__':
 
     # Configurations
     if args.command == "train":
-        config = CocoConfig()
+        config = CocoConfig(args.num_classes)
     else:
         class InferenceConfig(CocoConfig):
             # Set batch size to 1 since we'll be running inference on
             # one image at a time. Batch size = GPU_COUNT * IMAGES_PER_GPU
             GPU_COUNT = 1
+            local_device_protos = device_lib.list_local_devices()
+            num_gpus = len([x.name for x in local_device_protos if x.device_type == 'GPU'])
+            if num_gpus in [2,4,8]:
+    	        GPU_COUNT = num_gpus
             IMAGES_PER_GPU = 1
             DETECTION_MIN_CONFIDENCE = 0
         config = InferenceConfig()
@@ -501,7 +512,7 @@ if __name__ == '__main__':
         print("Training network heads")
         model.train(dataset_train, dataset_val,
                     learning_rate=config.LEARNING_RATE,
-                    epochs=1,
+                    epochs=args.stage1_epochs,
                     layers='heads',
                     augmentation=augmentation)
 
@@ -510,7 +521,7 @@ if __name__ == '__main__':
         print("Fine tune Resnet stage 4 and up")
         model.train(dataset_train, dataset_val,
                     learning_rate=config.LEARNING_RATE,
-                    epochs=1,
+                    epochs=args.stage2_epochs,
                     layers='4+',
                     augmentation=augmentation)
 
@@ -519,7 +530,7 @@ if __name__ == '__main__':
         print("Fine tune all layers")
         model.train(dataset_train, dataset_val,
                     learning_rate=config.LEARNING_RATE / 10,
-                    epochs=1,
+                    epochs=args.stage3_epochs,
                     layers='all',
                     augmentation=augmentation)
 
