@@ -107,10 +107,10 @@ class CocoDataset(utils.Dataset):
         if auto_download is True:
             self.auto_download(dataset_dir, subset, year)
 
-        coco = COCO("/onepanel/input/annotation.json")
+        coco = COCO("{}/annotation.json".format(dataset_dir))
         if subset == "minival" or subset == "valminusminival":
             subset = "val"
-        image_dir = "/onepanel/input/data/0".format(dataset_dir)
+        image_dir = "{}/data/0/".format(dataset_dir)
 
         # Load all classes or a subset?
         if not class_ids:
