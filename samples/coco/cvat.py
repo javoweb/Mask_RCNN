@@ -82,6 +82,7 @@ class CocoConfig(Config):
 
     # Uncomment to train on 8 GPUs (default is 1)
     # GPU_COUNT = 8
+    STEPS_PER_EPOCH = 600
 
     # Number of classes (including background)
     NUM_CLASSES = 2  # take form user *************************
