@@ -31,6 +31,8 @@ import os
 import sys
 import time
 import numpy as np
+from tensorflow.python.client import device_lib
+
 import imgaug  # https://github.com/aleju/imgaug (pip3 install imgaug)
 
 # Download and install the Python COCO tools from https://github.com/waleedka/coco
