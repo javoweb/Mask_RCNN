@@ -433,7 +433,7 @@ if __name__ == '__main__':
                         metavar="<True|False>",
                         help='Automatically download and unzip MS-COCO files (default=False)',
                         type=bool)
-    parser.add_argument('--num_classes', required=True, default=2, help="Number of Classes")
+    parser.add_argument('--num_classes', default=2, help="Number of Classes")
     parser.add_argument('--stage1_epochs', required=False, default=40, help="number of epochs for heads")
     parser.add_argument('--stage2_epochs', required=False, default=120, help="number of epochs for resnet stage 4 and up")
     parser.add_argument('--stage3_epochs', required=False, default=160, help="number of epochs for fine tuning all layers")
