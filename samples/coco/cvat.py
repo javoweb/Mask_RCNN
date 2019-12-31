@@ -62,7 +62,7 @@ COCO_MODEL_PATH = os.path.join(ROOT_DIR, "mask_rcnn_coco.h5")
 
 # Directory to save logs and model checkpoints, if not provided
 # through the command line argument --logs
-DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, "logs")
+DEFAULT_LOGS_DIR = os.path.join("/onepanel/output/", "logs")
 DEFAULT_DATASET_YEAR = "2014"
 
 ############################################################
@@ -75,6 +75,9 @@ class CocoConfig(Config):
     Derives from the base Config class and overrides values specific
     to the COCO dataset.
     """
+    def __init__(self, num_classes):
+    	self.NUM_CLASSES = num_classes
+    	super().__init__()
     # Give the configuration a recognizable name
     NAME = "cvat"
 
@@ -90,7 +93,7 @@ class CocoConfig(Config):
     	GPU_COUNT = num_gpus
 
     # Number of classes (including background)
-    #NUM_CLASSES = num_classes  # take form user *************************
+    # NUM_CLASSES = num_classes  # take form user *************************
 
 ############################################################
 #  Dataset
@@ -435,10 +438,10 @@ if __name__ == '__main__':
                         metavar="<True|False>",
                         help='Automatically download and unzip MS-COCO files (default=False)',
                         type=bool)
-    parser.add_argument('--num_classes', default=2, help="Number of Classes")
-    parser.add_argument('--stage1_epochs', required=False, default=40, help="number of epochs for heads")
-    parser.add_argument('--stage2_epochs', required=False, default=120, help="number of epochs for resnet stage 4 and up")
-    parser.add_argument('--stage3_epochs', required=False, default=160, help="number of epochs for fine tuning all layers")
+    parser.add_argument('--num_classes', default=2, type=int, help="Number of Classes")
+    parser.add_argument('--stage1_epochs', required=False, type=int, default=40, help="number of epochs for heads")
+    parser.add_argument('--stage2_epochs', required=False, type=int, default=120, help="number of epochs for resnet stage 4 and up")
+    parser.add_argument('--stage3_epochs', required=False, type=int, default=160, help="number of epochs for fine tuning all layers")
     args = parser.parse_args()
     print("Command: ", args.command)
     print("Model: ", args.model)
@@ -449,8 +452,8 @@ if __name__ == '__main__':
 
     # Configurations
     if args.command == "train":
-        config = CocoConfig()
-        config.NUM_CLASSES = args.num_classes
+        config = CocoConfig(args.num_classes)
+        # config.NUM_CLASSES = args.num_classes
     else:
         class InferenceConfig(CocoConfig):
             # Set batch size to 1 since we'll be running inference on
