@@ -68,7 +68,7 @@ DEFAULT_DATASET_YEAR = "2014"
 ############################################################
 
 
-class CocoConfig(Config, num_classes):
+class CocoConfig(Config):
     """Configuration for training on MS COCO.
     Derives from the base Config class and overrides values specific
     to the COCO dataset.
@@ -88,7 +88,7 @@ class CocoConfig(Config, num_classes):
     	GPU_COUNT = num_gpus
 
     # Number of classes (including background)
-    NUM_CLASSES = num_classes  # take form user *************************
+    #NUM_CLASSES = num_classes  # take form user *************************
 
 ############################################################
 #  Dataset
@@ -447,7 +447,8 @@ if __name__ == '__main__':
 
     # Configurations
     if args.command == "train":
-        config = CocoConfig(args.num_classes)
+        config = CocoConfig()
+        config.NUM_CLASSES = args.num_classes
     else:
         class InferenceConfig(CocoConfig):
             # Set batch size to 1 since we'll be running inference on
