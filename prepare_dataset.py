@@ -24,14 +24,13 @@ if __name__ == '__main__':
 	time = datetime.now()
 	stamp = time.strftime("%m%d%Y%H%M%S")
 	dataset_name = "maskrcnn-model-output-{}".format(stamp)
-	print("Curre", os.getcwd())
+	
 	os.system("onepanel datasets create {}".format(dataset_name))
 	os.chdir("/onepanel/code/{}".format(dataset_name))
-	print(os.getcwd())
-	os.system("mv /onepanel/output/classes.csv /onepanel/code/{}".format(dataset_name))
+	os.system("mv /onepanel/output/classes.csv /onepanel/code/{}/".format(dataset_name))
 	for i,_,_ in os.walk("/onepanel/output/logs"):
 		if "cvat" in i:
 			model_path = i
-	os.system("mv model_path/{} /onepanel/code/{}".format('mask_rcnn_cvat_0001.h5','dataset_name'))
+	os.system("mv {}/'mask_rcnn_cvat_0001.h5' /onepanel/code/{}/".format(model_path,dataset_name))
 	print("\n\n\n")
 	print("Dataset Created with Name: {}".format(dataset_name))
