@@ -23,10 +23,11 @@ if __name__ == '__main__':
 	from datetime import datetime
 	time = datetime.now()
 	stamp = time.strftime("%m%d%Y%H%M%S")
-	dataset_name = "MaskRCNN-model-output-{}".format(stamp)
-	
+	dataset_name = "maskrcnn-model-output-{}".format(stamp)
+	print("Curre", os.getcwd())
 	os.system("onepanel datasets create {}".format(dataset_name))
 	os.chdir("/onepanel/code/{}".format(dataset_name))
+	print(os.getcwd())
 	os.system("mv /onepanel/output/classes.csv /onepanel/code/{}".format(dataset_name))
 	for i,_,_ in os.walk("/onepanel/output/logs"):
 		if "cvat" in i:
