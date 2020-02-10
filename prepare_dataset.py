@@ -18,19 +18,25 @@ def generate_csv(input_file):
 
 if __name__ == '__main__':
 	import sys
+	from pprint import pprint
+
 	generate_csv(sys.argv[1])
 
 	from datetime import datetime
 	time = datetime.now()
 	stamp = time.strftime("%m%d%Y%H%M%S")
 	dataset_name = "maskrcnn-model-output-{}".format(stamp)
-	
+	print("dataset_name", dataset_name)
 	os.system("onepanel datasets create {}".format(dataset_name))
+	print("current Dir", os.getcwd())
+	
 	os.chdir("/onepanel/code/{}".format(dataset_name))
-	os.system("mv /onepanel/output/classes.csv /onepanel/code/{}/".format(dataset_name))
+	os.system("cp /onepanel/output/classes.csv /onepanel/code/{}/".format(dataset_name))
 	for i,_,_ in os.walk("/onepanel/output/logs"):
 		if "cvat" in i:
 			model_path = i
-	os.system("mv {}/'mask_rcnn_cvat_0001.h5' /onepanel/code/{}/".format(model_path,dataset_name))
+	print("model path", model_path)
+	os.system("cp {}/'mask_rcnn_cvat_0001.h5' /onepanel/code/{}/".format(model_path,dataset_name))
+	os.system('onepanel datasets push -m "update" --source job')
 	print("\n\n\n")
 	print("Dataset Created with Name: {}".format(dataset_name))
