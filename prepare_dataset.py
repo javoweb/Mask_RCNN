@@ -26,16 +26,13 @@ if __name__ == '__main__':
 	time = datetime.now()
 	stamp = time.strftime("%m%d%Y%H%M%S")
 	dataset_name = "maskrcnn-model-output-{}".format(stamp)
-	print("dataset_name", dataset_name)
 	os.system("onepanel datasets create {}".format(dataset_name))
-	print("current Dir", os.getcwd())
 	
 	os.chdir("/onepanel/code/{}".format(dataset_name))
 	os.system("cp /onepanel/output/classes.csv /onepanel/code/{}/".format(dataset_name))
 	for i,_,_ in os.walk("/onepanel/output/logs"):
 		if "cvat" in i:
 			model_path = i
-	print("model path", model_path)
 	os.system("cp {}/'mask_rcnn_cvat_0001.h5' /onepanel/code/{}/".format(model_path,dataset_name))
 	os.system('onepanel datasets push -m "update" --source job')
 	print("\n\n\n")
