@@ -486,11 +486,11 @@ if __name__ == '__main__':
         # Start from ImageNet trained weights
         model_path = model.get_imagenet_weights()
     else:
-        model_path = args.model
+        model_path = "/onepanel/code/mask_rcnn_coco.h5"
 
     # Load weights
     # print("Loading weights ", model_path)
-    # model.load_weights(model_path, by_name=True)
+    model.load_weights(model_path, by_name=True)
 
     # Train or evaluate
     if args.command == "train":
@@ -498,15 +498,15 @@ if __name__ == '__main__':
         # validation set, as as in the Mask RCNN paper.
         dataset_train = CocoDataset()
         dataset_train.load_coco(args.dataset, "train", year=args.year, auto_download=args.download)
-        if args.year in '2014':
-            dataset_train.load_coco(args.dataset, "valminusminival", year=args.year, auto_download=args.download)
+#         if args.year in '2014':
+#             dataset_train.load_coco(args.dataset, "valminusminival", year=args.year, auto_download=args.download)
         dataset_train.prepare()
 
         # Validation dataset
-        dataset_val = CocoDataset()
-        val_type = "val" if args.year in '2017' else "minival"
-        dataset_val.load_coco(args.dataset, val_type, year=args.year, auto_download=args.download)
-        dataset_val.prepare()
+#         dataset_val = CocoDataset()
+#         val_type = "val" if args.year in '2017' else "minival"
+#         dataset_val.load_coco(args.dataset, val_type, year=args.year, auto_download=args.download)
+#         dataset_val.prepare()
 
         # Image Augmentation
         # Right/Left flip 50% of the time
@@ -516,7 +516,7 @@ if __name__ == '__main__':
 
         # Training - Stage 1
         print("Training network heads")
-        model.train(dataset_train, dataset_val,
+        model.train(dataset_train,
                     learning_rate=config.LEARNING_RATE,
                     epochs=args.stage1_epochs,
                     layers='heads',
@@ -525,7 +525,7 @@ if __name__ == '__main__':
         # Training - Stage 2
         # Finetune layers from ResNet stage 4 and up
         print("Fine tune Resnet stage 4 and up")
-        model.train(dataset_train, dataset_val,
+        model.train(dataset_train,
                     learning_rate=config.LEARNING_RATE,
                     epochs=args.stage2_epochs,
                     layers='4+',
@@ -534,7 +534,7 @@ if __name__ == '__main__':
         # Training - Stage 3
         # Fine tune all layers
         print("Fine tune all layers")
-        model.train(dataset_train, dataset_val,
+        model.train(dataset_train,
                     learning_rate=config.LEARNING_RATE / 10,
                     epochs=args.stage3_epochs,
                     layers='all',
