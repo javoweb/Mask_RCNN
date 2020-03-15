@@ -438,7 +438,7 @@ if __name__ == '__main__':
                         metavar="<True|False>",
                         help='Automatically download and unzip MS-COCO files (default=False)',
                         type=bool)
-    parser.add_argument('--num_classes', default=2, type=int, help="Number of Classes")
+    parser.add_argument('--num_classes', default=81, type=int, help="Number of Classes")
     parser.add_argument('--stage1_epochs', required=False, type=int, default=40, help="number of epochs for heads")
     parser.add_argument('--stage2_epochs', required=False, type=int, default=120, help="number of epochs for resnet stage 4 and up")
     parser.add_argument('--stage3_epochs', required=False, type=int, default=160, help="number of epochs for fine tuning all layers")
@@ -449,7 +449,9 @@ if __name__ == '__main__':
     print("Year: ", args.year)
     print("Logs: ", args.logs)
     print("Auto Download: ", args.download)
-
+    if args.stage1_epochs==1 and args.stage2_epochs==1 and args.stage3_epochs==1:
+        args.stage1_epochs, args.stage2_epochs, args.stage3_epochs = 1,2,3
+       
     # Configurations
     if args.command == "train":
         config = CocoConfig(args.num_classes)
@@ -490,7 +492,10 @@ if __name__ == '__main__':
 
     # Load weights
     # print("Loading weights ", model_path)
-    model.load_weights(model_path, by_name=True)
+    if args.num_classes != 81:
+        model.load_weights(model_path, by_name=True, exclude=[ "mrcnn_class_logits", "mrcnn_bbox_fc", "mrcnn_bbox", "mrcnn_mask"])
+    else:
+        model.load_weights(model_path, by_name=True)
 
     # Train or evaluate
     if args.command == "train":
