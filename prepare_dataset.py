@@ -1,3 +1,5 @@
+# Prepares Dataset for the corresponding job with Trained Model and Classes File
+
 import json
 import csv
 import os
@@ -34,12 +36,10 @@ if __name__ == '__main__':
 	for i,_,_ in os.walk("/onepanel/output/logs"):
 		if "cvat" in i:
 			model_path = i
-	print("M", model_path)
 	if not model_path.endswith("/"):
 		model_path += "/"
-	print("model", model_path)
+	# find last saved model
 	latest_model = max(glob.glob(model_path+"mask*"), key=os.path.getctime)
-	print(latest_model)
 	os.system("cp {} /onepanel/code/{}/".format(latest_model,dataset_name))
 	os.system('onepanel datasets push -m "update" --source job')
 	print("\n\n\n")
