@@ -442,6 +442,7 @@ if __name__ == '__main__':
     parser.add_argument('--stage1_epochs', required=False, type=int, default=40, help="number of epochs for heads")
     parser.add_argument('--stage2_epochs', required=False, type=int, default=120, help="number of epochs for resnet stage 4 and up")
     parser.add_argument('--stage3_epochs', required=False, type=int, default=160, help="number of epochs for fine tuning all layers")
+    parser.add_argument('--extras', required=False, default=None, help="extra arguments from user")
     args = parser.parse_args()
     print("Command: ", args.command)
     print("Model: ", args.model)
