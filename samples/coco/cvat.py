@@ -488,6 +488,8 @@ if __name__ == '__main__':
     elif args.model.lower() == "imagenet":
         # Start from ImageNet trained weights
         model_path = model.get_imagenet_weights()
+    elif args.model.lower() == "workflow_maskrcnn":
+        model_path = "/mnt/src/mask_rcnn_coco.h5"
     else:
         model_path = "/onepanel/code/mask_rcnn_coco.h5"
 
