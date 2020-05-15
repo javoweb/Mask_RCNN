@@ -146,7 +146,7 @@ class CocoDataset(utils.Dataset):
             print(coco.imgs[i])
             self.add_image(
                 "coco", image_id=i,
-                path=os.path.join(image_dir, coco.imgs[i]['file_name']),
+                path=os.path.join(image_dir, os.path.basename(coco.imgs[i]['file_name'])),
                 width=coco.imgs[i]["width"],
                 height=coco.imgs[i]["height"],
                 annotations=coco.loadAnns(coco.getAnnIds(
