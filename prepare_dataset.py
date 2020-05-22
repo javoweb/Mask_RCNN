@@ -37,3 +37,4 @@ if __name__ == '__main__':
 		model_path += "/"
 	# find last saved model
 	latest_model = max(glob.glob(model_path+"mask*"), key=os.path.getctime)
+	print("Uploading to AWS S3")
