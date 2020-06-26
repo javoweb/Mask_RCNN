@@ -492,8 +492,8 @@ if __name__ == '__main__':
         print("Executed from Onepanel workflow")
         #find cvat dir
         for path,_,_ in os.walk("/mnt/data/models/logs"):
-    		if "cvat" in path.lower():
-			    cvat_path = path
+            if "cvat" in path.lower():
+               cvat_path = path
         if not cvat_path.endswith("/"):
             cvat_path += "/"
         # find last saved model
