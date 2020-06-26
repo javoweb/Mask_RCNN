@@ -32,6 +32,7 @@ import sys
 import time
 import numpy as np
 from tensorflow.python.client import device_lib
+import blob
 
 import imgaug  # https://github.com/aleju/imgaug (pip3 install imgaug)
 
@@ -488,7 +489,16 @@ if __name__ == '__main__':
         # Start from ImageNet trained weights
         model_path = model.get_imagenet_weights()
     elif args.model.lower() == "workflow_maskrcnn":
-        model_path = "/mnt/src/mask_rcnn_coco.h5"
+        print("Executed from Onepanel workflow")
+        #find cvat dir
+        for path,_,_ in os.walk("/mnt/data/models/logs"):
+    		if "cvat" in path.lower():
+			    cvat_path = path
+        if not cvat_path.endswith("/"):
+            cvat_path += "/"
+        # find last saved model
+        model_path = max(glob.glob(cvat_path+"mask_rcnn*"), key=os.path.getctime)
+        print("Latest model found: {}".format(model_path))
     else:
         model_path = "/onepanel/code/mask_rcnn_coco.h5"
 
