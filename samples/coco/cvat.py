@@ -32,7 +32,7 @@ import sys
 import time
 import numpy as np
 from tensorflow.python.client import device_lib
-import blob
+import glob
 
 import imgaug  # https://github.com/aleju/imgaug (pip3 install imgaug)
 
