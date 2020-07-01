@@ -499,26 +499,18 @@ if __name__ == '__main__':
             urllib.request.urlretrieve("https://github.com/matterport/Mask_RCNN/releases/download/v2.0/mask_rcnn_coco.h5","/mnt/data/models/mask_rcnn_coco.h5")
             model_path = "/mnt/data/models/mask_rcnn_coco.h5"
         else:
-            # try:
+            try:
             #use provided ref model
-            s3_resource = boto3.resource('s3')
-            bucket = s3_resource.Bucket(os.getenv('AWS_BUCKET_NAME')) 
-            for object in bucket.objects.filter(Prefix = args.ref_model_path):
-                print(os.path.basename(object.key))
-                bucket.download_file(object.key,'/mnt/data/models/'+os.path.basename(object.key))
-            #find cvat dir
-            # for path,_,_ in os.walk("/mnt/data/models/"):
-            #     print(path)
-            #     if "cvat" in path.lower():
-            #         cvat_path = path
-            # if not cvat_path.endswith("/"):
-            #     cvat_path += "/"
-            # find last saved model
-            model_path = max(glob.glob("/mnt/data/models/"+"mask_rcnn*"), key=os.path.getctime)
-            # except:
-            #     print("Something went wrong while trying to find model from ref model path, using default model.")
-            #     urllib.request.urlretrieve("https://github.com/matterport/Mask_RCNN/releases/download/v2.0/mask_rcnn_coco.h5","/mnt/data/models/mask_rcnn_coco.h5")
-            #     model_path = "/mnt/data/models/mask_rcnn_coco.h5"
+                s3_resource = boto3.resource('s3')
+                bucket = s3_resource.Bucket(os.getenv('AWS_BUCKET_NAME')) 
+                for object in bucket.objects.filter(Prefix = args.ref_model_path):
+                    print(os.path.basename(object.key))
+                    bucket.download_file(object.key,'/mnt/data/models/'+os.path.basename(object.key))
+                model_path = max(glob.glob("/mnt/data/models/"+"mask_rcnn*"), key=os.path.getctime)
+            except:
+                print("Something went wrong while trying to find model from ref model path, using default model.")
+                urllib.request.urlretrieve("https://github.com/matterport/Mask_RCNN/releases/download/v2.0/mask_rcnn_coco.h5","/mnt/data/models/mask_rcnn_coco.h5")
+                model_path = "/mnt/data/models/mask_rcnn_coco.h5"
         print("Model found: {}".format(model_path))
     else:
         model_path = "/onepanel/code/mask_rcnn_coco.h5"
