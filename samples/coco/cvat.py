@@ -506,7 +506,7 @@ if __name__ == '__main__':
             for object in bucket.objects.filter(Prefix = args.ref_model_path):
                 bucket.download_file(object.key,'/mnt/data/models/'+os.path.basename(object.key))
             #find cvat dir
-            for path,_,_ in os.walk("/mnt/data/models/logs"):
+            for path,_,_ in os.walk("/mnt/data/models/"):
                 if "cvat" in path.lower():
                     cvat_path = path
             if not cvat_path.endswith("/"):
