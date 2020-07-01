@@ -33,6 +33,7 @@ import time
 import numpy as np
 from tensorflow.python.client import device_lib
 import glob
+import boto3
 
 import imgaug  # https://github.com/aleju/imgaug (pip3 install imgaug)
 
@@ -443,6 +444,7 @@ if __name__ == '__main__':
     parser.add_argument('--stage2_epochs', required=False, type=int, default=120, help="number of epochs for resnet stage 4 and up")
     parser.add_argument('--stage3_epochs', required=False, type=int, default=160, help="number of epochs for fine tuning all layers")
     parser.add_argument('--extras', required=False, default=None, help="extra arguments from user")
+    parser.add_argument('--ref_model_path', default='', help="ref model path")
     args = parser.parse_args()
     print("Command: ", args.command)
     print("Model: ", args.model)
@@ -490,15 +492,32 @@ if __name__ == '__main__':
         model_path = model.get_imagenet_weights()
     elif args.model.lower() == "workflow_maskrcnn":
         print("Executed from Onepanel workflow")
-        #find cvat dir
-        for path,_,_ in os.walk("/mnt/data/models/logs"):
-            if "cvat" in path.lower():
-               cvat_path = path
-        if not cvat_path.endswith("/"):
-            cvat_path += "/"
-        # find last saved model
-        model_path = max(glob.glob(cvat_path+"mask_rcnn*"), key=os.path.getctime)
-        print("Latest model found: {}".format(model_path))
+        if not os.path.exists("/mnt/data/models"):
+            os.makedirs("/mnt/data/models")
+        if args.ref_model_path == '':
+            #download model
+            urllib.request.urlretrieve("https://github.com/matterport/Mask_RCNN/releases/download/v2.0/mask_rcnn_coco.h5","/mnt/data/models/mask_rcnn_coco.h5")
+            model_path = "/mnt/data/models/mask_rcnn_coco.h5"
+        else:
+            try:
+                #use provided ref model
+                s3_resource = boto3.resource('s3')
+                bucket = s3_resource.Bucket(os.getenv('AWS_BUCKET_NAME')) 
+                for object in bucket.objects.filter(Prefix = args.ref_model_path):
+                    bucket.download_file(object.key,'/mnt/data/models/'+os.path.basename(object.key))
+                #find cvat dir
+                for path,_,_ in os.walk("/mnt/data/models/logs"):
+                    if "cvat" in path.lower():
+                        cvat_path = path
+                if not cvat_path.endswith("/"):
+                    cvat_path += "/"
+                # find last saved model
+                model_path = max(glob.glob(cvat_path+"mask_rcnn*"), key=os.path.getctime)
+            except:
+                print("Something went wrong while trying to find model from ref model path, using default model.")
+                urllib.request.urlretrieve("https://github.com/matterport/Mask_RCNN/releases/download/v2.0/mask_rcnn_coco.h5","/mnt/data/models/mask_rcnn_coco.h5")
+                model_path = "/mnt/data/models/mask_rcnn_coco.h5"
+        print("Model found: {}".format(model_path))
     else:
         model_path = "/onepanel/code/mask_rcnn_coco.h5"
 
