@@ -118,41 +118,57 @@ class CocoDataset(utils.Dataset):
         if auto_download is True:
             self.auto_download(dataset_dir, subset, year)
 
-        coco = COCO("{}/annotations/instances_default.json".format(dataset_dir))
+        sub_directories = next(os.walk(dataset_dir))[1]
+        print("Fetching annotations from following directories: ", sub_directories)
+        coco_objects = []
+        for sub_dir in sub_directories:
+
+            coco = COCO("{}/annotations/instances_default.json".format(os.path.join(dataset_dir, sub_dir)))
+            coco_objects.append(coco)
+
+        # not required for Onepanel
         if subset == "minival" or subset == "valminusminival":
             subset = "val"
-        image_dir = "{}/images/".format(dataset_dir)
+
+        # image_dir = "{}/images/".format(dataset_dir)
 
         # Load all classes or a subset?
+        class_ids = []
         if not class_ids:
             # All classes
-            class_ids = sorted(coco.getCatIds())
+            for coco_obj in coco_objects:
+                class_ids.extend(coco_obj.getCatIds())
+            class_ids = sorted(set(class_ids))
+
 
         # All images or a subset?
         if class_ids:
             image_ids = []
             for id in class_ids:
-                image_ids.extend(list(coco.getImgIds(catIds=[id])))
+                for idx, coco_obj in enumerate(coco_objects):
+                    image_ids.append((list(coco_obj.getImgIds(catIds=[id])),idx))
             # Remove duplicates
-            image_ids = list(set(image_ids))
+            # image_ids = list(set(image_ids))
         else:
             # All images
             image_ids = list(coco.imgs.keys())
 
         # Add classes
         for i in class_ids:
-            self.add_class("coco", i, coco.loadCats(i)[0]["name"])
+            for coco_obj in coco_objects:
+                self.add_class("coco", i, coco_obj.loadCats(i)[0]["name"])
 
         # Add images
-        for i in image_ids:
-            print(coco.imgs[i])
-            self.add_image(
-                "coco", image_id=i,
-                path=os.path.join(image_dir, os.path.basename(coco.imgs[i]['file_name'])),
-                width=coco.imgs[i]["width"],
-                height=coco.imgs[i]["height"],
-                annotations=coco.loadAnns(coco.getAnnIds(
-                    imgIds=[i], catIds=class_ids, iscrowd=None)))
+        for sub_image_idx, sub_dir_idx in image_ids:
+            # print(coco.imgs[i])
+            for i in sub_image_idx:
+                self.add_image(
+                    "coco", image_id=i,
+                    path=os.path.join(os.path.join(dataset_dir, sub_directories[sub_dir_idx],"images"), os.path.basename(coco_objects[sub_dir_idx].imgs[i]['file_name'])),
+                    width=coco_objects[sub_dir_idx].imgs[i]["width"],
+                    height=coco_objects[sub_dir_idx].imgs[i]["height"],
+                    annotations=coco_objects[sub_dir_idx].loadAnns(coco_objects[sub_dir_idx].getAnnIds(
+                        imgIds=[i], catIds=class_ids, iscrowd=None)))
         if return_coco:
             return coco
 
@@ -531,6 +547,7 @@ if __name__ == '__main__':
 #         if args.year in '2014':
 #             dataset_train.load_coco(args.dataset, "valminusminival", year=args.year, auto_download=args.download)
         dataset_train.prepare()
+        print("Sample points", dataset_train.image_info[30:35])
 
         # Validation dataset
 #         dataset_val = CocoDataset()
