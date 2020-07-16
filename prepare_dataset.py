@@ -7,7 +7,7 @@ import glob
 
 # create csv file for inference
 def generate_csv(dataset_dir):
-	sub_directories = next(os.walk(dataset_dir))[1]
+    sub_directories = next(os.walk(dataset_dir))[1]
     csv_out = open(os.path.join("./", "classes.csv"), "w", newline='')
 
     csv_writer = csv.writer(csv_out)
@@ -26,7 +26,7 @@ def generate_csv(dataset_dir):
 
 
 if __name__ == '__main__':
-	import sys
-	from pprint import pprint
+    import sys
+    from pprint import pprint
 
-	generate_csv(sys.argv[1])
+    generate_csv(sys.argv[1])
