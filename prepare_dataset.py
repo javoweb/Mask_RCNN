@@ -14,7 +14,7 @@ def generate_csv(dataset_dir):
     csv_writer.writerow(['labels','id'])
     labels = []
     for sub_dir in sub_directories:
-        with open(os.path.join(dataset_dir, sub_dir, "annotations/instances_default.json", )) as f:
+        with open(os.path.join(dataset_dir, sub_dir, "annotations/instances_default.json"), 'r') as f:
             data = json.load(f)
 
        
