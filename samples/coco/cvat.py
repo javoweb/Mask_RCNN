@@ -470,7 +470,7 @@ if __name__ == '__main__':
     	        GPU_COUNT = num_gpus
             IMAGES_PER_GPU = 1
             DETECTION_MIN_CONFIDENCE = 0
-        config = InferenceConfig()
+        config = InferenceConfig(args.num_classes)
     config.display()
 
     # Create model
