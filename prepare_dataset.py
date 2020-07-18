@@ -8,7 +8,7 @@ import glob
 # create csv file for inference
 def generate_csv(dataset_dir):
     sub_directories = next(os.walk(dataset_dir))[1]
-	print("All directories: ", sub_directories)
+    print("All directories: ", sub_directories)
     print("Storing CSV at ", os.path.join("/mnt/output/", "classes.csv"))
     csv_out = open(os.path.join("/mnt/output/", "classes.csv"), "w", newline='')
 
@@ -16,7 +16,7 @@ def generate_csv(dataset_dir):
     csv_writer.writerow(['labels','id'])
     labels = []
     for sub_dir in sub_directories:
-    	print("Checking sub dir ", sub_dir)
+        print("Checking sub dir ", sub_dir)
         with open(os.path.join(dataset_dir, sub_dir, "annotations/instances_default.json"), 'r') as f:
             data = json.load(f)
 
