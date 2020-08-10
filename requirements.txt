@@ -5,7 +5,7 @@ cython
 matplotlib
 scikit-image
 keras==2.1.0
-opencv-python
+opencv-python==4.3.0.36
 h5py
 imgaug
 IPython[all]
