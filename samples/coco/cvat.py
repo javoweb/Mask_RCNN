@@ -451,6 +451,7 @@ if __name__ == '__main__':
     print("Dataset: ", args.dataset)
     print("Year: ", args.year)
     print("Logs: ", args.logs)
+    print("Extras: ", args.extras)
     print("Auto Download: ", args.download)
     if args.stage1_epochs==1 and args.stage2_epochs==1 and args.stage3_epochs==1:
         args.stage1_epochs, args.stage2_epochs, args.stage3_epochs = 1,2,3
