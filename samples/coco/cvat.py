@@ -456,7 +456,7 @@ if __name__ == '__main__':
        
     # Configurations
     if args.command == "train":
-        config = CocoConfig(params['num-classes'])
+        config = CocoConfig(int(params['num-classes']))
         # config.NUM_CLASSES = args.num_classes
     else:
         class InferenceConfig(CocoConfig):
@@ -469,7 +469,7 @@ if __name__ == '__main__':
     	        GPU_COUNT = num_gpus
             IMAGES_PER_GPU = 1
             DETECTION_MIN_CONFIDENCE = 0
-        config = InferenceConfig(params['num-classes'])
+        config = InferenceConfig(int(params['num-classes']))
     config.display()
 
     # Create model
@@ -516,7 +516,7 @@ if __name__ == '__main__':
 
     # Load weights
     # print("Loading weights ", model_path)
-    if params['num-classes'] != 81:
+    if int(params['num-classes']) != 81:
         model.load_weights(model_path, by_name=True, exclude=[ "mrcnn_class_logits", "mrcnn_bbox_fc", "mrcnn_bbox", "mrcnn_mask"])
     else:
         model.load_weights(model_path, by_name=True)
@@ -547,7 +547,7 @@ if __name__ == '__main__':
         print("Training network heads")
         model.train(dataset_train,
                     learning_rate=config.LEARNING_RATE,
-                    epochs=params['stage-1-epochs'],
+                    epochs=int(params['stage-1-epochs']),
                     layers='heads',
                     augmentation=augmentation)
 
@@ -556,7 +556,7 @@ if __name__ == '__main__':
         print("Fine tune Resnet stage 4 and up")
         model.train(dataset_train,
                     learning_rate=config.LEARNING_RATE,
-                    epochs=params['stage-2-epochs'],
+                    epochs=int(params['stage-2-epochs']),
                     layers='4+',
                     augmentation=augmentation)
 
@@ -565,7 +565,7 @@ if __name__ == '__main__':
         print("Fine tune all layers")
         model.train(dataset_train,
                     learning_rate=config.LEARNING_RATE / 10,
-                    epochs=params['stage-3-epochs'],
+                    epochs=int(params['stage-3-epochs']),
                     layers='all',
                     augmentation=augmentation)
 
