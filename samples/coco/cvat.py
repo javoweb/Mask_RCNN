@@ -439,10 +439,6 @@ if __name__ == '__main__':
                         metavar="<True|False>",
                         help='Automatically download and unzip MS-COCO files (default=False)',
                         type=bool)
-    parser.add_argument('--num_classes', default=81, type=int, help="Number of Classes")
-    parser.add_argument('--stage1_epochs', required=False, type=int, default=40, help="number of epochs for heads")
-    parser.add_argument('--stage2_epochs', required=False, type=int, default=120, help="number of epochs for resnet stage 4 and up")
-    parser.add_argument('--stage3_epochs', required=False, type=int, default=160, help="number of epochs for fine tuning all layers")
     parser.add_argument('--extras', required=False, default=None, help="extra arguments from user")
     parser.add_argument('--ref_model_path', default='', help="ref model path")
     args = parser.parse_args()
@@ -453,12 +449,14 @@ if __name__ == '__main__':
     print("Logs: ", args.logs)
     print("Extras: ", args.extras)
     print("Auto Download: ", args.download)
-    if args.stage1_epochs==1 and args.stage2_epochs==1 and args.stage3_epochs==1:
-        args.stage1_epochs, args.stage2_epochs, args.stage3_epochs = 1,2,3
+    extras = args.extras.split("\n")
+    extras_processed = [i.split("#")[0].replace(" ","") for i in extras if i]
+    params = {i.split('=')[0]:i.split('=')[1] for i in extras_processed}
+    print("Parameters: ", params)
        
     # Configurations
     if args.command == "train":
-        config = CocoConfig(args.num_classes)
+        config = CocoConfig(params['num-classes'])
         # config.NUM_CLASSES = args.num_classes
     else:
         class InferenceConfig(CocoConfig):
@@ -471,7 +469,7 @@ if __name__ == '__main__':
     	        GPU_COUNT = num_gpus
             IMAGES_PER_GPU = 1
             DETECTION_MIN_CONFIDENCE = 0
-        config = InferenceConfig(args.num_classes)
+        config = InferenceConfig(params['num-classes'])
     config.display()
 
     # Create model
@@ -518,7 +516,7 @@ if __name__ == '__main__':
 
     # Load weights
     # print("Loading weights ", model_path)
-    if args.num_classes != 81:
+    if params['num-classes'] != 81:
         model.load_weights(model_path, by_name=True, exclude=[ "mrcnn_class_logits", "mrcnn_bbox_fc", "mrcnn_bbox", "mrcnn_mask"])
     else:
         model.load_weights(model_path, by_name=True)
@@ -549,7 +547,7 @@ if __name__ == '__main__':
         print("Training network heads")
         model.train(dataset_train,
                     learning_rate=config.LEARNING_RATE,
-                    epochs=args.stage1_epochs,
+                    epochs=params['stage-1-epochs'],
                     layers='heads',
                     augmentation=augmentation)
 
@@ -558,7 +556,7 @@ if __name__ == '__main__':
         print("Fine tune Resnet stage 4 and up")
         model.train(dataset_train,
                     learning_rate=config.LEARNING_RATE,
-                    epochs=args.stage2_epochs,
+                    epochs=params['stage-2-epochs'],
                     layers='4+',
                     augmentation=augmentation)
 
@@ -567,7 +565,7 @@ if __name__ == '__main__':
         print("Fine tune all layers")
         model.train(dataset_train,
                     learning_rate=config.LEARNING_RATE / 10,
-                    epochs=args.stage3_epochs,
+                    epochs=params['stage-3-epochs'],
                     layers='all',
                     augmentation=augmentation)
 
