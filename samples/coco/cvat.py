@@ -440,6 +440,7 @@ if __name__ == '__main__':
                         help='Automatically download and unzip MS-COCO files (default=False)',
                         type=bool)
     parser.add_argument('--extras', required=False, default=None, help="extra arguments from user")
+    parser.add_argument('--num_classes', default=81, help="Number of classes present in a dataset")
     parser.add_argument('--ref_model_path', default='', help="ref model path")
     args = parser.parse_args()
     print("Command: ", args.command)
@@ -448,6 +449,7 @@ if __name__ == '__main__':
     print("Year: ", args.year)
     print("Logs: ", args.logs)
     print("Extras: ", args.extras)
+    print("Num Classes: ", args.num_classes)
     print("Auto Download: ", args.download)
     extras = args.extras.split("\n")
     extras_processed = [i.split("#")[0].replace(" ","") for i in extras if i]
@@ -456,7 +458,7 @@ if __name__ == '__main__':
        
     # Configurations
     if args.command == "train":
-        config = CocoConfig(int(params['num-classes']))
+        config = CocoConfig(int(args.num_classes))
         # config.NUM_CLASSES = args.num_classes
     else:
         class InferenceConfig(CocoConfig):
@@ -469,7 +471,7 @@ if __name__ == '__main__':
     	        GPU_COUNT = num_gpus
             IMAGES_PER_GPU = 1
             DETECTION_MIN_CONFIDENCE = 0
-        config = InferenceConfig(int(params['num-classes']))
+        config = InferenceConfig(int(args.num_classes))
     config.display()
 
     # Create model
@@ -516,7 +518,7 @@ if __name__ == '__main__':
 
     # Load weights
     # print("Loading weights ", model_path)
-    if int(params['num-classes']) != 81:
+    if int(args.num_classes) != 81:
         model.load_weights(model_path, by_name=True, exclude=[ "mrcnn_class_logits", "mrcnn_bbox_fc", "mrcnn_bbox", "mrcnn_mask"])
     else:
         model.load_weights(model_path, by_name=True)
