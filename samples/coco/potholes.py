@@ -78,9 +78,9 @@ class CocoConfig(Config):
     to the COCO dataset.
     """
     def __init__(self, num_classes, steps):
-    	self.NUM_CLASSES = num_classes
+        self.NUM_CLASSES = num_classes
         self.STEPS_PER_EPOCH = steps
-    	super().__init__()
+        super().__init__()
     # Give the configuration a recognizable name
     NAME = "cvat"
 
