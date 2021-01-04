@@ -8,3 +8,4 @@ keras==2.1.0
 opencv-python==4.2.0.34
 h5py
 imgaug
+pycocotools
